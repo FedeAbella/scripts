@@ -1,4 +1,5 @@
 #!/bin/bash
+## Create a local .gitignore file
 
 git_root=$(git rev-parse --show-toplevel 2>&1)
 [[ -d "$git_root" ]] || { echo "Not a git repository" >&2 && exit 1; }

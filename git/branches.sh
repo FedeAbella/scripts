@@ -1,4 +1,5 @@
 #!/bin/bash
+## Pretty list git branches with remote and description
 
 function listBranches() {
     branches=$(git branch --list "--color")

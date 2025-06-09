@@ -1,4 +1,5 @@
 #!/bin/bash
+## Pull another branch and rebase current branch from that one
 
 remote=origin
 
