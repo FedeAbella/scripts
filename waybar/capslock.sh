@@ -1,11 +1,11 @@
 #!/bin/bash
 ## Check if capslock is pressed and return a status to waybar
 
-capslock=$(cat /sys/class/leds/input10::capslock/brightness)
-
-if [[ "$capslock" == "1" ]]; then
-    echo '{"text": "locked", "alt": "locked", "class": "locked"}'
-    exit 0
-fi
+for input in /sys/class/leds/*; do
+    if [[ "$input" =~ .*capslock ]] && [[ $(cat "$input"/brightness) == "1" ]]; then
+        echo '{"text": "locked", "alt": "locked", "class": "locked"}'
+        exit 0
+    fi
+done
 
 echo '{"text": "unlocked", "alt": "unlocked", "class": "unlocked"}'
