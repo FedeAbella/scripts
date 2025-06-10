@@ -57,16 +57,33 @@ if [[ -f all_failed.csv ]]; then
     sort all_errors | uniq -c | sort -n -r | sed 's| *||' | sed 's| |,|' >>unique_errors.csv
 fi
 
-env printf "\n\e[1;34m-----\n\u279C Results summary:\n-----\e[0m\n"
+total_success=0
+total_failures=0
+total_unique=0
 if [[ -f all_success.csv ]]; then
-    echo "Total successful records across all batches: $(tail -n +2 all_success.csv | wc -l)"
-else
-    echo "No successful records across all batches"
+    total_success=$(tail -n +2 all_success.csv | wc -l)
+fi
+if [[ -f all_failed.csv ]]; then
+    total_failures=$(tail -n +2 all_failed.csv | wc -l)
+    total_unique=$(tail -n +2 unique_errors.csv | wc -l)
 fi
 
-if [[ -f all_failed.csv ]]; then
-    echo "Total failed records across all batches: $(tail -n +2 all_failed.csv | wc -l)"
-    echo "Total unique errors across all batches: $(tail -n +2 unique_errors.csv | wc -l)"
-else
-    echo "No failed records across all batches"
-fi
+total_records=$((total_success + total_failures))
+
+cat >summary <<EOL
+Job ran at: $(date +"%F %T UTC%z")
+Compiled jobs:
+$(for jobId in "${ids[@]}"; do echo "$jobId"; done)
+
+Total records: $total_records
+Successes: $total_success
+Failures: $total_failures
+Unique Errors: $total_unique
+
+Successful results in all_success.csv
+Failed results in all_failed.csv
+Unique errors in unique_errors.csv
+EOL
+
+env printf "\n\e[1;34m-----\n\u279C Results summary:\n-----\e[0m\n"
+cat summary
