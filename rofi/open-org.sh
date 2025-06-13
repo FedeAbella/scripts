@@ -17,6 +17,9 @@ format() {
     done
 }
 
+# Need to load nvm otherwise sf is not available when launching through keybind
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+
 command -v sf >/dev/null || exit 1
 
 orgs=$(sf org list --skip-connection-status --json)
