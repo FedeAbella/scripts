@@ -18,6 +18,7 @@ format() {
 }
 
 # Need to load nvm otherwise sf is not available when launching through keybind
+# shellcheck disable=SC1091
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
 command -v sf >/dev/null || exit 1
