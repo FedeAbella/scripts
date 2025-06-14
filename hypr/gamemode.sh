@@ -1,8 +1,7 @@
 #!/bin/bash
 ## disables hyprland pretty stuff for improved game performance
 
-hyprgamemode=$(hyprctl getoption animations:enabled | awk 'NR==1{print $2}')
-if [ "$hyprgamemode" = 1 ]; then
+if [ "$(hyprctl getoption animations:enabled | awk 'NR==1{print $2}')" = 1 ]; then
     hyprctl --batch "\
         keyword animations:enabled 0;\
         keyword decoration:shadow:enabled 0;\

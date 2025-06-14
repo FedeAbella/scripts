@@ -1,5 +1,12 @@
 #!/bin/bash
 
+SRC_DIR=src
+SUCCESS_FILE=all_success.csv
+FAILED_FILE=all_failed.csv
+ERRORS_FILE=all_errors
+UNIQUE_ERRORS_FILE=unique_errors.csv
+SUMMARY_FILE=summary
+
 read -r -p "Enter target org: " target_org
 read -r -p "Enter batch job IDs (space separated list): " -a ids
 
@@ -11,20 +18,20 @@ total_failed=0
 total_unique=0
 header=
 
-if [[ ! -d src ]]; then
-    mkdir src
+if [[ ! -d "$SRC_DIR" ]]; then
+    mkdir "$SRC_DIR"
 fi
-if [[ -f all_success.csv ]]; then
-    rm -f all_success.csv
+if [[ -f "$SUCCESS_FILE" ]]; then
+    rm -f "$SUCCESS_FILE"
 fi
-if [[ -f all_failed.csv ]]; then
-    rm -f all_failed.csv
+if [[ -f "$FAILED_FILE" ]]; then
+    rm -f "$FAILED_FILE"
 fi
-if [[ -f all_errors.csv ]]; then
-    rm -f all_errors.csv
+if [[ -f "$ERRORS_FILE" ]]; then
+    rm -f "$ERRORS_FILE"
 fi
-if [[ -f unique_errors.csv ]]; then
-    rm -f unique_errors.csv
+if [[ -f "$UNIQUE_ERRORS_FILE" ]]; then
+    rm -f "$UNIQUE_ERRORS_FILE"
 fi
 
 env printf "\n\e[1;34m-----\n\u279C Retrieving ${#ids[@]} jobs from $target_org\n-----\e[0m\n"
@@ -80,12 +87,12 @@ for id in "${ids[@]}"; do
             continue
         fi
 
-        if [[ ! -f all_success.csv ]]; then
-            echo "$success_header" >all_success.csv
+        if [[ ! -f "$SUCCESS_FILE" ]]; then
+            echo "$success_header" >"$SUCCESS_FILE"
         fi
 
-        tail -n +2 "$filename_success" >>all_success.csv
-        mv "$filename_success" src/"$filename_success"
+        tail -n +2 "$filename_success" >>"$SUCCESS_FILE"
+        mv "$filename_success" "$SRC_DIR"/"$filename_success"
     fi
 
     if [[ -n $filename_failed ]]; then
@@ -97,12 +104,12 @@ for id in "${ids[@]}"; do
             continue
         fi
 
-        if [[ ! -f all_failed.csv ]]; then
-            echo "$failed_header" >all_failed.csv
+        if [[ ! -f "$FAILED_FILE" ]]; then
+            echo "$failed_header" >"$FAILED_FILE"
         fi
 
-        tail -n +2 "$filename_failed" >>all_failed.csv
-        mv "$filename_failed" src/"$filename_failed"
+        tail -n +2 "$filename_failed" >>"$FAILED_FILE"
+        mv "$filename_failed" "$SRC_DIR"/"$filename_failed"
     fi
 
     total_processed=$((total_processed + $(grep '"processedRecords":' <(echo "$job") | sed -e 's/.*: \([0-9]\+\).*/\1/')))
@@ -110,17 +117,17 @@ for id in "${ids[@]}"; do
     total_failed=$((total_failed + $(grep '"failedRecords":' <(echo "$job") | sed -e 's/.*: \([0-9]\+\).*/\1/')))
 done
 
-if [[ -f all_failed.csv ]]; then
-    env printf "\n\e[1;34m-----\n\u279C Extracting errors into all_errors and unique_errors.csv...\n-----\e[0m\n"
+if [[ -f "$FAILED_FILE" ]]; then
+    env printf "\n\e[1;34m-----\n\u279C Extracting errors into $ERRORS_FILE and $UNIQUE_ERRORS_FILE...\n-----\e[0m\n"
 
-    tail -n +2 all_failed.csv | sed 's|[^,]*,||' | sed 's|,.*||' >all_errors
+    tail -n +2 "$FAILED_FILE" | sed 's|[^,]*,||' | sed 's|,.*||' >"$ERRORS_FILE"
 
-    echo "count,error" >unique_errors.csv
-    sort all_errors | uniq -c | sort -n -r | sed 's| *||' | sed 's| |,|' >>unique_errors.csv
-    total_unique=$(tail -n +2 unique_errors.csv | wc -l)
+    echo "count,error" >"$UNIQUE_ERRORS_FILE"
+    sort "$ERRORS_FILE" | uniq -c | sort -n -r | sed 's| *||' | sed 's| |,|' >>"$UNIQUE_ERRORS_FILE"
+    total_unique=$(tail -n +2 "$UNIQUE_ERRORS_FILE" | wc -l)
 fi
 
-cat >summary <<EOL
+cat >"$SUMMARY_FILE" <<EOL
 Job ran at: $(date +"%F %T UTC%z")
 Compiled jobs:
 $(for jobId in "${ids[@]}"; do echo "$jobId"; done)
@@ -130,16 +137,16 @@ Successes: $total_success
 Failures: $total_failed
 Unique Errors: $total_unique
 
-Successful results in all_success.csv
+Successful results in "$SUCCESS_FILE"
 EOL
 
 if [[ $total_failed -gt 0 ]]; then
-    cat >>summary <<EOL
-Failed results in all_failed.csv
-All errors in all_errors
-Unique errors in unique_errors.csv
+    cat >>"$SUMMARY_FILE" <<EOL
+Failed results in "$FAILED_FILE"
+All errors in "$ERRORS_FILE"
+Unique errors in "$UNIQUE_ERRORS_FILE"
 EOL
 fi
 
 env printf "\n\e[1;34m-----\n\u279C Results summary:\n-----\e[0m\n"
-cat summary
+cat "$SUMMARY_FILE"

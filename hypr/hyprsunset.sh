@@ -1,23 +1,26 @@
 #!/bin/bash
 ## Toggle hyprsunset on/off based on a config file
 
-temp_dir="${HOME}"/.config/hyprsunset
-temp_file="${temp_dir}"/temp
-current_temp="6000"
-night_temp="3500"
+CONFIG_DIR="${HOME}"/.config/hyprsunset
+CONFIG_FILE="${CONFIG_DIR}"/temp
+DAY_TEMP="6000"
+NIGHT_TEMP="3500"
 
-if [[ ! -d "$temp_dir" ]]; then
-    mkdir "$temp_dir"
+current_temp=
+if [[ ! -d "$CONFIG_DIR" ]]; then
+    mkdir "$CONFIG_DIR"
 fi
 
-if [[ -f "$temp_file" ]]; then
-    current_temp=$(cat "$temp_file")
+if [[ -f "$CONFIG_FILE" ]]; then
+    current_temp=$(cat "$CONFIG_FILE")
+else
+    current_temp="$DAY_TEMP"
 fi
 
-if [[ "$current_temp" == "6000" ]]; then
-    hyprctl hyprsunset temperature "$night_temp"
-    echo "$night_temp" >"$temp_file"
+if [[ "$current_temp" == "$DAY_TEMP" ]]; then
+    hyprctl hyprsunset temperature "$NIGHT_TEMP"
+    echo "$NIGHT_TEMP" >"$CONFIG_FILE"
 else
     hyprctl hyprsunset identity
-    echo "6000" >"$temp_file"
+    echo "$DAY_TEMP" >"$CONFIG_FILE"
 fi

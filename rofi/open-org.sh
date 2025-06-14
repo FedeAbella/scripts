@@ -1,6 +1,6 @@
 #!/bin/bash
 
-declare -A types=(
+declare -A TYPES=(
     ["Other"]="#cba6f7"
     ["Sandbox"]="#fab387"
     ["DevHub"]="#a6e3a1"
@@ -10,8 +10,8 @@ declare -A types=(
 format() {
     while read -r org; do
         org=$(sed 's|"||' <(echo "$org"))
-        for type in "${!types[@]}"; do
-            org=$(sed "s|/${type}/\"|<span color='${types["$type"]}'> ($type)</span>|" <(echo "$org"))
+        for type in "${!TYPES[@]}"; do
+            org=$(sed "s|/${type}/\"|<span color='${TYPES["$type"]}'> ($type)</span>|" <(echo "$org"))
         done
         echo "$org"
     done
