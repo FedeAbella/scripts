@@ -21,12 +21,12 @@ format() {
 # shellcheck disable=SC1091
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
-command -v sf >/dev/null || exit 1
+command -v sf >/dev/null || { notify-send "sf command not found" && exit 1; }
 
 orgs=$(sf org list --skip-connection-status --json)
-[ $? ] || exit 1
+[ $? ] || { notify-send "sf cli command failed" && exit 1; }
 
-[ "$(grep '"status": [0-9]' <(echo "$orgs") | sed 's/.*: \([0-9]\)\+.*/\1/')" ] || exit 1
+[ "$(grep '"status": [0-9]' <(echo "$orgs") | sed 's/.*: \([0-9]\)\+.*/\1/')" ] || { notify-send "Failed to get orgs from cli command" && exit 1; }
 
 chosen=$(jq '[.result.nonScratchOrgs.[] | {username, alias, isDevHub: .isDevHub // false, isSandbox: .isSandbox // false, isScratch: false}] + [.result.scratchOrgs.[] | {username, alias, isDevHub, isSandbox, isScratch}] | .[] | "\(.alias)/\(if .isScratch then "Scratch" elif .isDevHub then "DevHub" elif .isSandbox then "Sandbox" else "Other" end)/"' \
     <(echo "$orgs") |
