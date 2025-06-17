@@ -41,6 +41,11 @@ for id in "${ids[@]}"; do
 
     job=$(sf data bulk results --target-org "${target_org}" --job-id "${id}" --json)
 
+    if [[ -z "$job" ]]; then
+        echo "sf cli returned no results. Skipping..." >&2
+        continue
+    fi
+
     if [[ $(grep '"status": [0-9]' <(echo "$job") | sed -e 's/.*: \([0-9]\+\).*/\1/') != "0" ]]; then
         echo "Job query failed with error \"$(grep '"message":' <(echo "$job") | sed -e 's/.*: "\(.*\)".*/\1/')\"" >&2
         echo "Skipping..." >&2
