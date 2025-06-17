@@ -17,6 +17,8 @@ format() {
     done
 }
 
+notify-send "Querying orgs..." --urgency low --expire-time 1000 --transient
+
 # Need to load nvm otherwise sf is not available when launching through keybind
 # shellcheck disable=SC1091
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
