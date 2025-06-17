@@ -17,6 +17,7 @@ total_success=0
 total_failed=0
 total_unique=0
 header=
+processed_summary="id,processed,reason\n"
 
 if [[ ! -d "$SRC_DIR" ]]; then
     mkdir "$SRC_DIR"
@@ -43,17 +44,20 @@ for id in "${ids[@]}"; do
 
     if [[ -z "$job" ]]; then
         echo "sf cli returned no results. Skipping..." >&2
+        processed_summary+="${id},✗,\"no results\"\n"
         continue
     fi
 
     if [[ $(grep '"status": [0-9]' <(echo "$job") | sed -e 's/.*: \([0-9]\+\).*/\1/') != "0" ]]; then
-        echo "Job query failed with error \"$(grep '"message":' <(echo "$job") | sed -e 's/.*: "\(.*\)".*/\1/')\"" >&2
-        echo "Skipping..." >&2
+        error=$(grep '"message":' <(echo "$job") | sed -e 's/.*: "\(.*\)".*/\1/')
+        echo "Job query failed with error \"${error}\". Skipping..." >&2
+        processed_summary+="${id},✗,\"query failed\"\n"
         continue
     fi
 
     if [[ ! $(grep '"status": "' <(echo "$job") | sed -e 's/.*: "\(.*\)".*/\1/') =~ ^JobComplete$ ]]; then
         echo "Job $id did not complete successfully. Skipping..." >&2
+        processed_summary+="${id},✗,\"job failed\"\n"
         continue
     fi
 
@@ -72,6 +76,7 @@ for id in "${ids[@]}"; do
         if [[ -f "$filename_failed" ]]; then
             rm -f "$filename_failed"
         fi
+        processed_summary+="${id},✗,\"wrong object\"\n"
         continue
     fi
 
@@ -88,6 +93,7 @@ for id in "${ids[@]}"; do
 
         if [[ "$header" != $(echo "$success_header" | sed -e 's/"sf__[^"]\+",//g') ]]; then
             echo "Job columns don't match those of first job. Skipping..." >&2
+            processed_summary+="${id},✗,\"wrong columns\"\n"
             rm -f "$filename_success"
             continue
         fi
@@ -105,6 +111,7 @@ for id in "${ids[@]}"; do
 
         if [[ "$header" != $(echo "$failed_header" | sed -e 's/"sf__[^"]\+",//g') ]]; then
             echo "Job columns don't match those of first job. Skipping..." >&2
+            processed_summary+="${id},✗,\"wrong columns\"\n"
             rm -f "$filename_failed"
             continue
         fi
@@ -120,6 +127,7 @@ for id in "${ids[@]}"; do
     total_processed=$((total_processed + $(grep '"processedRecords":' <(echo "$job") | sed -e 's/.*: \([0-9]\+\).*/\1/')))
     total_success=$((total_success + $(grep '"successfulRecords":' <(echo "$job") | sed -e 's/.*: \([0-9]\+\).*/\1/')))
     total_failed=$((total_failed + $(grep '"failedRecords":' <(echo "$job") | sed -e 's/.*: \([0-9]\+\).*/\1/')))
+    processed_summary+="${id},✔,\n"
 done
 
 if [[ -f "$FAILED_FILE" ]]; then
@@ -133,9 +141,10 @@ if [[ -f "$FAILED_FILE" ]]; then
 fi
 
 cat >"$SUMMARY_FILE" <<EOL
-Job ran at: $(date +"%F %T UTC%z")
-Compiled jobs:
-$(for jobId in "${ids[@]}"; do echo "$jobId"; done)
+Ran at: $(date +"%F %T UTC%z")
+sObject: $object
+Jobs:
+$(column --separator ',' --table <(printf "%b" "$processed_summary") | sed -e 's/"//g')
 
 Total records: $total_processed
 Successes: $total_success
