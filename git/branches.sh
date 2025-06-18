@@ -26,7 +26,7 @@ while read -r branch; do
         remote_col="\e[1;34m[${remote}/${merge}]\e[0m"
     fi
 
-    print_string="${print_string}${branch_col}\t${remote_col}\t${description}\n"
+    print_string+="${branch_col}\t${remote_col}\t${description}\n"
 done <<<"$(git branch --list "--color")"
 
 printf '%b' "$print_string" | column --table --separator $'\t'

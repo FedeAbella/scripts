@@ -1,9 +1,9 @@
 #!/bin/bash
 ## Check if dotfiles repo is stale and return text to waybar
 
-git -C "{$HOME}"/.dotfiles fetch &>/dev/null
-behind=$(git -C "{$HOME}"/.dotfiles rev-list --count main..origin/main)
-ahead=$(git -C "{$HOME}"/.dotfiles rev-list --count origin/main..main)
+git -C "$HOME"/.dotfiles fetch &>/dev/null
+behind=$(git -C "$HOME"/.dotfiles rev-list --count main..origin/main)
+ahead=$(git -C "$HOME"/.dotfiles rev-list --count origin/main..main)
 
 text=""
 if [[ "$behind" -gt 0 ]]; then
