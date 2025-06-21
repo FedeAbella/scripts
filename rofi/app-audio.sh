@@ -4,6 +4,9 @@
 sinks=$(pactl -f json list sinks 2>/dev/null | jq '[.[] | {name: .properties."alsa.card_name", id: .index}]')
 apps=$(pactl -f json list sink-inputs | jq '[.[] | {name: .properties."application.name", id: .index, media: .properties."media.name"}]')
 
+[[ $(jq '.[] | length' <(echo "$sinks")) -gt 0 ]] || { notify-send "No sinks found" --transient --urgency low --expire-time 1000 && exit 0; }
+[[ $(jq '.[] | length' <(echo "$apps")) -gt 0 ]] || { notify-send "No apps playing audio" --transient --urgency low --expire-time 1000 && exit 0; }
+
 chosen_app=$(jq '.[] | "\(.name)    --    \(.media)"' <(echo "$apps") | sed -e 's/\(^"\)\|\("$\)//g' | rofi -theme-str "*{ width: 1000;}" -dmenu -p "Choose app:" -format i)
 [[ -n "$chosen_app" ]] || exit 0
 chosen_sink=$(jq '.[] | .name' <(echo "$sinks") | sed -e 's/\(^"\)\|\("$\)//g' | rofi -dmenu -p "Choose output:" -format i)
