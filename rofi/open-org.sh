@@ -38,7 +38,9 @@ chosen=$(jq '[.result.nonScratchOrgs.[] | {username, alias, isDevHub: .isDevHub 
 
 [ -n "$chosen" ] || exit 1
 
-open_result=$(sf org open -o "$chosen" --json)
+open_result=$(sf org open -o "$chosen" --json --url-only)
 if [[ "$(jq '.status' <(echo "$open_result"))" != "0" ]]; then
     notify-send "cli failed to open org" "$(jq '.message' <(echo "$open_result") | sed 's/\(^"\)\|\("$\)//g')"
 fi
+
+xdg-open "$(jq '.result.url' <(echo "$open_result") | sed 's/\(^"\)\|\("$\)//g')"
