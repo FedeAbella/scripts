@@ -7,8 +7,14 @@ ERRORS_FILE=all_errors
 UNIQUE_ERRORS_FILE=unique_errors.csv
 SUMMARY_FILE=summary
 
-read -r -p "Enter target org: " target_org
-read -r -p "Enter batch job IDs (space separated list): " -a ids
+args=("$@")
+target_org="${args[0]}"
+ids=("${args[@]:1}")
+
+if [[ -z "$target_org" ]] || [[ "${#ids[@]}" -eq 0 ]]; then
+    echo "target org and at least one job id are needed" >&2
+    exit 1
+fi
 
 object=
 job_num=0
