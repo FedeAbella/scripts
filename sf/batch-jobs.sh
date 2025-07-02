@@ -41,7 +41,7 @@ if [[ -f "$UNIQUE_ERRORS_FILE" ]]; then
     rm -f "$UNIQUE_ERRORS_FILE"
 fi
 
-env printf "\n\e[1;34m-----\n\u279C Retrieving ${#ids[@]} jobs from $target_org\n-----\e[0m\n"
+env printf "\n\e[1;34m-----\n\u279C Retrieving ${#ids[@]} job(s) from $target_org\n-----\e[0m\n"
 for id in "${ids[@]}"; do
     job_num=$((job_num + 1))
     echo "Retrieving job #$job_num, ID: $id..."
