@@ -1,21 +1,27 @@
 #!/bin/bash
 
+subdirs=(
+    "organizations"
+    "contacts"
+    "taxonomies"
+    "specialties"
+    "products"
+    "practitioners/account"
+    "practitioners/provider"
+    "locations/account"
+    "locations/facility"
+    "locations/provider"
+    "languages"
+    "hps"
+    "hpt"
+    "hfn"
+    "cpfs"
+    "claims"
+)
+
 today=$(date +"%F" | sed -e 's/-//g')
-mkdir -p "$today"/organizations \
-    "$today"/org_contacts \
-    "$today"/taxonomies \
-    "$today"/specialties \
-    "$today"/products \
-    "$today"/practitioners/account \
-    "$today"/practitioners/provider \
-    "$today"/locations/account \
-    "$today"/locations/facility \
-    "$today"/locations/provider \
-    "$today"/languages \
-    "$today"/hps \
-    "$today"/hpt \
-    "$today"/hpf \
-    "$today"/hfn \
-    "$today"/cpfs
+for subdir in "${subdirs[@]}"; do
+    mkdir -p "$today"/"$subdir"
+done
 
 cd "$today" || exit

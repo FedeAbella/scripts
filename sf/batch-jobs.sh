@@ -149,6 +149,8 @@ fi
 cat >"$SUMMARY_FILE" <<EOL
 Ran at: $(date +"%F %T UTC%z")
 sObject: $object
+Org: $target_org
+
 Jobs:
 $(column --separator ',' --table <(printf "%b" "$processed_summary") | sed -e 's/"//g')
 
