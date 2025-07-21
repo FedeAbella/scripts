@@ -14,6 +14,7 @@ subdirs=(
     "languages"
     "hps"
     "hpt"
+    "hpf"
     "hfn"
     "cpfs"
     "claims"
