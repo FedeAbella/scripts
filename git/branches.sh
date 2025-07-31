@@ -1,6 +1,9 @@
 #!/bin/bash
 ## Pretty list git branches with remote and description
 
+git_root=$(git rev-parse --show-toplevel 2>&1)
+[[ -d "$git_root" ]] || { echo "Not a git repository" >&2 && return 1; }
+
 print_string="\033[31;1mBranch\033[0m\t\033[31;1mRemote\033[0m\t\033[31;1mDescription\033[0m\n"
 
 while read -r branch; do
