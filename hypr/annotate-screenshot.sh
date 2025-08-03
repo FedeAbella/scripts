@@ -1,7 +1,7 @@
 #!/bin/bash
 ## Take a screenshot with hyprshot and annotate with satty
 
-filename=$(hyprcap shot region --freeze --no-notify -F 2>/dev/null | sed -e 's/[^\/]*\(\/\)/\1/')
+filename=$(hyprcap shot region --freeze --no-notify -F 2>/dev/null)
 output_filename=$(date +'%F-%H%M%S_annotated.png')
 wait_deadline=$((SECONDS + 5))
 if [[ -n "$filename" ]]; then
