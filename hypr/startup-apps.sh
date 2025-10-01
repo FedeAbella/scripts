@@ -6,7 +6,7 @@ user=$(whoami)
 case $user in
     fede)
         hyprctl dispatch exec "[workspace 4] kitty -e btop"
-        hyprctl dispatch exec "[workspace 7 silent] flatpak run com.rtosta.zapzap"
+        hyprctl dispatch exec "[workspace 7 silent] elecwhat"
         hyprctl dispatch exec "[workspace 7 silent] discord"
         sleep 5
         hyprctl dispatch exec "[workspace 1] firefox"
