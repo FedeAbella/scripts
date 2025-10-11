@@ -6,10 +6,10 @@ handle() {
     case $1 in
         screencast*)
             if [[ "${1:12:1}" -eq 1 ]]; then
-                notify-send -e -t 2 "Sharing screen. Inhibiting swaync"
+                notify-send -e -t 2000 "Sharing screen. Inhibiting swaync"
                 swaync-client --inhibitor-add "screencast"
             else
-                notify-send -e -t 2 "Stopped sharing screen. Clearing swaync"
+                notify-send -e -t 2000 "Stopped sharing screen. Clearing swaync"
                 swaync-client --inhibitor-remove "screencast"
             fi
             ;;
