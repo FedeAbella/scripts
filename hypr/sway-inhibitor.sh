@@ -9,8 +9,8 @@ handle() {
                 notify-send -e -t 2000 "Sharing screen. Inhibiting swaync"
                 swaync-client --inhibitor-add "screencast"
             else
-                notify-send -e -t 2000 "Stopped sharing screen. Clearing swaync"
                 swaync-client --inhibitor-remove "screencast"
+                notify-send -e -t 2000 "Stopped sharing screen. Clearing swaync"
             fi
             ;;
     esac
